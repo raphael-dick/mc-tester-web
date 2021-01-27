@@ -9,11 +9,13 @@ function App() {
   const [ showRightAnswer, setShowRightAnswer ] = useState(false)
   const [ currentQuestion, setCurrentQuestion ] = useState(undefined)
   const [ answeredQuestions, setAnsweredQuestions ] = useState([])
-  const [ wrongQuestions, setWrongQuestions ] = useState([])
-
-  const [ error, setError ] = useState(undefined)
 
   const form = useRef(null)
+
+  const nextQuestion = () => {
+    const question = questions[Math.floor(Math.random() * questions.length)];
+    setCurrentQuestion(question)
+  }
 
   useEffect(() => {
     if(!fileUrl) return
@@ -22,17 +24,12 @@ function App() {
       return data.json()
     }).then(data => {
       if(!Array.isArray(data)) {
-        return setError("Not a valid File")
+        return console.error("Not a valid File")
       }
       setQuestions(data)
       nextQuestion()
     })
   }, [fileUrl])
-
-  const nextQuestion = () => {
-    const question = questions[Math.floor(Math.random() * questions.length)];
-    setCurrentQuestion(question)
-  }
 
   console.log("Answered:", answeredQuestions.length);
   console.log("All:", questions.length);
