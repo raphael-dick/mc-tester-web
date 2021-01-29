@@ -9,6 +9,8 @@ function App() {
   const [ showRightAnswer, setShowRightAnswer ] = useState(false)
   const [ currentQuestion, setCurrentQuestion ] = useState(undefined)
   const [ answeredQuestions, setAnsweredQuestions ] = useState([])
+  const [ showErrors, setShowErrors ] = useState(false)
+  const [ errors, setErrors ] = useState([])
 
   const form = useRef(null)
 
@@ -61,6 +63,7 @@ function App() {
       nextQuestion()
     } else {
       setShowRightAnswer(true)
+      setErrors([ currentQuestion, ...errors ])
     }
   }
 
@@ -90,7 +93,42 @@ function App() {
             <p style={{textAlign: 'center'}}>Bereits einmal richtig beantwortete Fragen kommen während dieser Session nicht erneut, ansonsten ist das Tool dumm.</p>
             <button onClick={nextQuestion}>START</button>
           </>
-        : showRightAnswer ?
+        :
+        <>
+        <button style={{marginBottom: '2em'}} onClick={() => { setShowErrors(!showErrors) }}>{!showErrors ? 'Fehler anzeigen' : 'zurück'}</button>
+        <div className="information-screen">
+          <div className="item">
+            <div className="value">{ errors.length }</div>
+            <div className="title">falsch</div>
+          </div>
+          <div className="item">
+            <div className="value">{ questions.length }</div>
+            <div className="title">verbleibend</div>
+          </div>
+          <div className="item">
+            <div className="value">{ answeredQuestions.length }</div>
+            <div className="title">richtig</div>
+          </div>
+        </div>
+        { showErrors ?
+          <>
+          { errors && errors.map(question =>
+            <>
+              <p style={{color: 'red', padding: 0, margin: 0}}>{question.q}</p>
+              <form disabled>
+              { question.answers.map(( q, i ) =>
+                <div key={i}>
+                  <input type="checkbox" id={i} checked={question.rightids.includes(q.id)} />
+                <label>{q.text}</label>
+                </div>
+              )}
+              </form>
+            </>
+
+          )}
+          </>
+
+          : showRightAnswer ?
           <>
             <p style={{color: 'red', padding: 0, margin: 0}}>Fehler: {currentQuestion.q}</p>
             <form ref={form} disabled>
@@ -114,6 +152,7 @@ function App() {
             <button onClick={checkQuestion}>check</button>
 
           </>
+        }</>
       }
     </div>
   );
